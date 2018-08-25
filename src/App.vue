@@ -57,13 +57,25 @@ export default {
       gameover: false,
       cleardStock: [],
       vegetables: [
-        'たまねぎ',
-        'ぴーまん',
-        'きゆうり',
-        'くろやなぎてつこ',
-        'はくさい',
+        'あすぱらがす',
+        'いも',
+        'かぼちゃ',
         'きやべつ',
-        'じやがいも',
+        'くろやなぎてつこ',
+        'ごぼう',
+        'こまつな',
+        'せろり',
+        'だいこん',
+        'たまねぎ',
+        'とまと',
+        'なす',
+        'にんじん',
+        'はくさい',
+        'ぱせり',
+        'ぴーまん',
+        'ぶろつこりー',
+        'ほうれんそう',
+        'れたす',
       ],
     }
   },
@@ -239,11 +251,7 @@ export default {
     addLetterStock() {
       this.letterStock = this.letterStock.concat(
         this.arrShuffle(
-          this.arrSample(this.vegetables)
-            .split('')
-            .concat([
-              this.generateRandomLetter(),
-              this.generateRandomLetter()]))
+          this.arrSample(this.vegetables).split(''))
       );
     },
     generateRandomLetter() {
