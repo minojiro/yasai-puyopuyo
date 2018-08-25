@@ -399,7 +399,7 @@ body {
   text-align: center;
   font-size: 20px;
   border-radius: 5px;
-  padding: 10px 0 5px;
+  padding: 15px 0 10px;
 }
 
 .score {
