@@ -360,7 +360,7 @@ body {
 .links {
   margin: 0;
   padding: 0;
-  margin-top: 30px;
+  margin-top: 40px;
 }
 
 .links>li {
