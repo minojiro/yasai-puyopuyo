@@ -1,6 +1,8 @@
-# yasai-puyopuyo
+# やさいぷよぷよ
 
-> tetsuko.
+やさいの名前を揃えると消える
+
+元ネタ: [じゃがりきん(@jagarikin)さんのツイート](https://twitter.com/jagarikin/status/1032816709088858113)
 
 ## Build Setup
 
