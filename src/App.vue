@@ -24,7 +24,7 @@
           <div class="stocks">
             <div class="stocks-title">NEXT</div>
             <div class="stocks-list">
-              <block v-for="(letter, key) in letterStock" :key="key" :letter="letter" full="true"></block>
+              <block v-for="(letter, key) in printLetterStock" :key="key" :letter="letter" full="true"></block>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default {
   data() {
     return {
       blocks: [],
-      letterStock: ['た', 'ま', 'ね', 'ぎ', ], // todo: set empty
+      letterStock: [],
       score: -1,
       curLetter: '',
       curX: 3,
@@ -75,6 +75,9 @@ export default {
     this.initializeGame();
   },
   computed: {
+    printLetterStock() {
+      return this.letterStock.slice(0,5);
+    },
     printBlocks() {
       return this.blocks.map((row, y) => {
         return row.map((o, x) => {
@@ -129,6 +132,9 @@ export default {
           return {letter: null};
         });
       });
+      this.addLetterStock();
+      this.addLetterStock();
+      this.addLetterStock();
       this.setNewLetter();
       this.fillEnclosure();
       this.fallTimer();
@@ -155,6 +161,12 @@ export default {
     },
     arrTranspose(a) {
       return a[0].map((_, c) => a.map(r => r[c]));
+    },
+    arrSample(a) {
+      return a[Math.floor(Math.random() * a.length)];
+    },
+    arrShuffle(a) {
+      return a.sort(()=>Math.random() - .5);
     },
     fillEnclosure() {
       const lastKey = this.blocks.length - 1;
@@ -220,7 +232,19 @@ export default {
       this.score++;
       this.curLetter = this.letterStock[0];
       this.letterStock.shift();
-      this.letterStock.push(this.generateRandomLetter());
+      if(this.letterStock.length < 6) {
+        this.addLetterStock();
+      }
+    },
+    addLetterStock() {
+      this.letterStock = this.letterStock.concat(
+        this.arrShuffle(
+          this.arrSample(this.vegetables)
+            .split('')
+            .concat([
+              this.generateRandomLetter(),
+              this.generateRandomLetter()]))
+      );
     },
     generateRandomLetter() {
       return this.allLetters[Math.floor(Math.random() * this.allLetters.length)];
