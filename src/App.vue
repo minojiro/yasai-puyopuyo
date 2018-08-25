@@ -386,13 +386,17 @@ body {
 .controller>li {
   flex: 1;
   background: #444;
+  background: -moz-linear-gradient(top, rgba(102,102,102,1) 1%, rgba(50,50,50,1) 100%);
+  background: -webkit-linear-gradient(top, rgba(102,102,102,1) 1%,rgba(50,50,50,1) 100%);
+  background: linear-gradient(to bottom, rgba(102,102,102,1) 1%,rgba(50,50,50,1) 100%);
   color: #fff;
   list-style: none;
   font-size: 10px;
   margin: 0 1px;
   text-align: center;
   font-size: 20px;
-  padding: 10px;
+  border-radius: 5px;
+  padding: 10px 0 5px;
 }
 
 .score {
