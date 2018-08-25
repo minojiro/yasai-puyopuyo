@@ -36,7 +36,6 @@
       </ul>
       <ul class="links">
         <li>元ネタ：<a href="https://twitter.com/jagarikin/status/1032816709088858113" target="_blank">じゃがりきん(@jagarikin)さんのツイート</a></li>
-        <li>開発リポジトリ：<a href="https://github.com/minojiro/yasai-puyopuyo" target="_blank">minojiro/yasai-puyopuyo</a></li>
       </ul>
     </div>
   </div>
