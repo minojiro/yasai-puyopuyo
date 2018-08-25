@@ -10,7 +10,11 @@
           </div>
           <div class="field-over" v-if="gameover">
             <div class="field-over-inner">
-              <span>ゲームオーバー</span>
+              <div>
+                <span>ゲームオーバー</span><br>
+                <span>{{score}}点</span>
+                <a class="twitter-share" :href="twitterShareUrl" target="_blank"><i class="fa fa-twitter"></i>点数をツイート</a>
+              </div>
             </div>
           </div>
           <div class="field" :class="{gameover: gameover}">
@@ -20,7 +24,7 @@
           </div>
         </div>
         <div class="stocks-wrap">
-          <div class="score">score:{{score}}</div>
+          <div class="score">{{score}}点</div>
           <div class="stocks">
             <div class="stocks-title">NEXT</div>
             <div class="stocks-list">
@@ -120,6 +124,9 @@ export default {
     cleardVegetableName() {
       return this.cleard ? this.cleard.vegetable : null;
     },
+    twitterShareUrl() {
+      return `https://twitter.com/share?url=http://yasai-puyopuyo.s3-website-ap-northeast-1.amazonaws.com/&hashtags=やさいぷよぷよ&text=やさいぷよぷよで、${this.score}点とりました！`
+    }
   },
   watch: {
     cleard() {
@@ -334,6 +341,7 @@ body {
   top: 0;
   height: 100%;
   width: 100%;
+  z-index: 1;
 }
 
 .field-over-inner {
@@ -342,7 +350,7 @@ body {
   width: 100%;
   font-size: 36px;
   font-weight: bold;
-  margin-top: -0.5em;
+  margin-top: -1.5em;
   top: 50%;
 }
 
@@ -391,6 +399,18 @@ body {
   font-size: 18px;
   font-weight: bold;
   text-align: center;
+}
+
+.twitter-share {
+  display: block;
+  margin: 0 20px;
+  font-size: 15px;
+  text-decoration: none;
+  background: #1EA1F3;
+  color: #fff;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 @media screen and (max-width: 500px) {
