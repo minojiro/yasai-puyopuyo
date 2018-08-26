@@ -18,8 +18,12 @@
             </div>
           </div>
           <div class="field" :class="{gameover: gameover}">
-            <div v-for="(row, key) in printBlocks"  :key="key">
-              <block v-for="(block, key) in row" :key="key" :letter="block.letter" :cur="block.isCur" :cleard="block.cleard"></block>
+            <div v-for="(row, key) in printField"  :key="key">
+              <div class="field-block-wrap" v-for="(block, key) in row" :key="key">
+                <block
+                  :letter="block.letter"
+                  :is-cursor="block.isCursor" :is-cleard="block.isCleard"></block>
+              </div>
             </div>
           </div>
         </div>
@@ -28,7 +32,7 @@
           <div class="stocks">
             <div class="stocks-title">NEXT</div>
             <div class="stocks-list">
-              <block v-for="(letter, key) in printLetterStock" :key="key" :letter="letter" full="true"></block>
+              <block v-for="(letter, key) in printWaitingLetter" :key="key" :letter="letter"></block>
             </div>
           </div>
         </div>
@@ -52,14 +56,14 @@ export default {
   name: 'App',
   data() {
     return {
-      blocks: [],
-      letterStock: [],
+      field: [],
+      waitingLetters: [],
       score: -1,
       curLetter: '',
       curX: 3,
       curY: 0,
       gameover: false,
-      cleardStock: [],
+      pendingClearBlocks: [],
       vegetables: [
         'あすぱらがす',
         'いも',
@@ -95,25 +99,25 @@ export default {
     this.initializeGame();
   },
   computed: {
-    printLetterStock() {
-      return this.letterStock.slice(0,5);
+    printWaitingLetter() {
+      return this.waitingLetters.slice(0,5);
     },
-    printBlocks() {
-      return this.blocks.map((row, y) => {
-        return row.map((o, x) => {
+    printField() {
+      return this.field.map((row, y) => {
+        return row.map((block, x) => {
           if (y === this.curY && x === this.curX) {
             return {
               letter: this.curLetter,
-              isCur: true
+              isCursor: true
             };
           } else {
-            return o;
+            return block;
           }
         }).slice(1, row.length - 1);
-      }).slice(0, this.blocks.length - 1);
+      }).slice(0, this.field.length - 1);
     },
     isStopped() {
-      return !!this.cleardStock.length || this.gameover;
+      return !!this.pendingClearBlocks.length || this.gameover;
     },
     allLetters() {
       return this.vegetables
@@ -122,7 +126,7 @@ export default {
         .filter((x, i, self) => self.indexOf(x) === i);
     },
     cleard() {
-      return this.cleardStock[0] || null;
+      return this.pendingClearBlocks[0] || null;
     },
     cleardVegetableName() {
       return this.cleard ? this.cleard.vegetable : null;
@@ -135,13 +139,13 @@ export default {
     cleard() {
       if (!this.cleard) return;
       this.cleard.blocks.reduce((a, b) => a.concat(b)).forEach(block => {
-        this.blocks[block.y][block.x].cleard = true;
+        this.field[block.y][block.x].isCleard = true;
       });
       setTimeout(() => {
-        this.cleardStock.shift();
+        this.pendingClearBlocks.shift();
         this.score += 20;
         if (!this.cleard) {
-          this.fillEmptyBlocks();
+          this.closeEmptyBlocks();
           setTimeout(this.clearSentence, 10);
         }
       }, 500)
@@ -149,15 +153,13 @@ export default {
   },
   methods: {
     initializeGame() {
-      for (let i = 0; i < 2; i++) this.letterStock.push(this.generateRandomLetter())
-      this.blocks = Array.from({length: 11}, _ => {
+      for (let i = 0; i < 2; i++) this.waitingLetters.push(this.generateRandomLetter())
+      this.field = Array.from({length: 11}, _ => {
         return Array.from({length: 10}, _ => {
           return {letter: null};
         });
       });
-      this.addLetterStock();
-      this.addLetterStock();
-      this.addLetterStock();
+      for(let i = 0; i < 3; i++) this.addLetterStock();
       this.setNewLetter();
       this.fillEnclosure();
       this.fallTimer();
@@ -172,28 +174,28 @@ export default {
         if (keymap[kc.keyCode]) this.moveCursor(keymap[kc.keyCode]);
       };
     },
-    fillEmptyBlocks() {
-      const trans = this.arrTranspose(this.blocks).map(r => {
-        r = r.filter(o => !o.cleard)
+    closeEmptyBlocks() {
+      const trans = this.arrTranspose(this.field).map(r => {
+        r = r.filter(o => !o.isCleard)
         r = Array.from({length: 11 - r.length}, _ => {
           return {letter: null}
         }).concat(r)
         return r;
       });
-      this.blocks = this.arrTranspose(trans);
+      this.field = this.arrTranspose(trans);
     },
-    arrTranspose(a) {
-      return a[0].map((_, c) => a.map(r => r[c]));
+    arrTranspose(arr) {
+      return arr[0].map((_, c) => arr.map(r => r[c]));
     },
-    arrSample(a) {
-      return a[Math.floor(Math.random() * a.length)];
+    arrSample(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
     },
-    arrShuffle(a) {
-      return a.sort(()=>Math.random() - .5);
+    arrShuffle(arr) {
+      return arr.sort(()=>Math.random() - .5);
     },
     fillEnclosure() {
-      const lastKey = this.blocks.length - 1;
-      this.blocks = this.blocks.map((row, key) => {
+      const lastKey = this.field.length - 1;
+      this.field = this.field.map((row, key) => {
         if (key === lastKey) {
           return Array.from({length: 10}, (v, k) => {
             return {letter: '/'};
@@ -206,25 +208,29 @@ export default {
     },
     moveCursor(dir) {
       if (!this.isStopped && !this.setCur(this.curX + dir.x, this.curY + dir.y) && dir.y > 0) {
-        this.blocks[this.curY][this.curX] = {letter: this.curLetter}
+        this.field[this.curY][this.curX] = {letter: this.curLetter}
         this.clearSentence();
         this.curY = 0;
         this.curX = 3;
-        if (this.blocks[this.curY][this.curX].letter) this.gameover = true;
-        this.setNewLetter();
+        if (this.field[this.curY][this.curX].letter){
+          this.gameover = true;
+          this.sendScore();
+        } else {
+          this.setNewLetter();
+        }
       }
     },
     setCur(x, y) {
-      if (this.blocks[y][x].letter) return false;
+      if (this.field[y][x].letter) return false;
       this.curX = x;
       this.curY = y;
       return true;
     },
     clearSentence() {
-      this.cleardStock = this.vegetables.map(vegetable => {
+      this.pendingClearBlocks = this.vegetables.map(vegetable => {
         const vegetableSplit = vegetable.split('');
         const blocks = vegetableSplit.map((letter) => {
-          return this.blocks.map((row, y) => {
+          return this.field.map((row, y) => {
             return row.map((col, x) => {
               return col.letter === letter ? [{x, y}] : null;
             })
@@ -253,20 +259,28 @@ export default {
     },
     setNewLetter() {
       this.score++;
-      this.curLetter = this.letterStock[0];
-      this.letterStock.shift();
-      if(this.letterStock.length < 6) {
+      this.curLetter = this.waitingLetters[0];
+      this.waitingLetters.shift();
+      if(this.waitingLetters.length < 6) {
         this.addLetterStock();
       }
     },
     addLetterStock() {
-      this.letterStock = this.letterStock.concat(
+      this.waitingLetters = this.waitingLetters.concat(
         this.arrShuffle(
           this.arrSample(this.vegetables).split(''))
       );
     },
     generateRandomLetter() {
       return this.allLetters[Math.floor(Math.random() * this.allLetters.length)];
+    },
+    sendScore() {
+      if(!window.gtag) return;
+      gtag('event', 'gameend', {
+        'event_category': 'yasai-puyopuyo',
+        'event_label': 'gameend',
+        'value': this.score,
+      });
     },
   }
 }
@@ -276,6 +290,24 @@ export default {
 body {
   background: #D5D6D9;
   padding: 10px;
+}
+
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
+
+.game {
+  max-width: 550px;
+  margin: 100px auto 0;
+  text-align: left;
+}
+
+.game-inner {
+  display: flex;
+  justify-content: space-between;
 }
 
 .field {
@@ -298,44 +330,13 @@ body {
   filter: grayscale(100%);
 }
 
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-
-.game {
-  max-width: 550px;
-  margin: 100px auto 0;
-  text-align: left;
-}
-
-.game-inner {
-  display: flex;
-  justify-content: space-between;
+.field-block-wrap {
+  width: calc(100% / 8);
 }
 
 .field-wrap {
   flex: 1;
   position: relative;
-}
-
-.stocks-wrap {
-  width: 20%;
-  margin-left: 20px;
-}
-
-.stocks-title {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.stocks-list {
-  width: 50px;
-  margin: 0 auto;
 }
 
 .field-over {
@@ -355,6 +356,23 @@ body {
   font-weight: bold;
   margin-top: -1.5em;
   top: 50%;
+}
+
+.stocks-wrap {
+  width: 20%;
+  margin-left: 20px;
+}
+
+.stocks-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.stocks-list {
+  width: 50px;
+  margin: 0 auto;
 }
 
 .links {

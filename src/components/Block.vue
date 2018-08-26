@@ -9,7 +9,7 @@
 <script>
 export default {
   name: 'Block',
-  props: ['letter', 'cur', 'cleard', 'full'],
+  props: ['letter', 'isCursor', 'isCleard', 'full'],
   data () {
     return {
     }
@@ -17,9 +17,9 @@ export default {
   computed: {
     blockClasses() {
       return {
-        cur: this.cur,
         full: this.full,
-        cleard: this.cleard,
+        cursor: this.isCursor,
+        cleard: this.isCleard,
       };
     }
   },
@@ -32,7 +32,8 @@ export default {
 <style scoped>
 .outer {
   box-sizing: border-box;
-  width: calc(100% / 8);
+  width: 100%;
+  height: 100%;
   position: relative;
 }
 .outer.full {
@@ -59,7 +60,7 @@ export default {
   display: table;
   overflow: hidden;
 }
-.inner.cur {
+.inner.cursor {
   background: #BE9D60;
 }
 .inner.cleard {
