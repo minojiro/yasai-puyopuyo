@@ -44,6 +44,7 @@
       </ul>
       <ul class="links">
         <li>元ネタ：<a href="https://twitter.com/jagarikin/status/1032816709088858113" target="_blank">じゃがりきん(@jagarikin)さんのツイート</a></li>
+        <li>作者：<a href="https://twitter.com/the_minojiro" target="_blank">みのじろー</a></li>
       </ul>
     </div>
   </div>
