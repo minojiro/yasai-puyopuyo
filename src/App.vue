@@ -65,7 +65,7 @@ export default {
       curY: 0,
       gameover: false,
       pendingClearBlocks: [],
-      vegetables: [
+      unsortedVegetables: [
         'あすぱらがす',
         'いも',
         'うり',
@@ -119,6 +119,9 @@ export default {
     },
     isStopped() {
       return !!this.pendingClearBlocks.length || this.gameover;
+    },
+    vegetables() {
+      return this.unsortedVegetables.sort((a, b) => b.length - a.length);
     },
     allLetters() {
       return this.vegetables
