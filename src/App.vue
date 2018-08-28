@@ -1,19 +1,30 @@
 <template>
   <div id="app">
-    <Game></Game>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import Game from './components/Game'
+import Ranking from './components/Ranking'
+import VueRouter from 'vue-router'
+import Vuex from 'vuex'
+
+const router = new VueRouter({
+  routes: [
+    { path: '/', component: Game },
+    { path: '/ranking', component: Ranking, props: true },
+  ]
+})
 
 export default {
   name: 'App',
   data() {
+    return {
+      score: false,
+    }
   },
-  components: {
-    Game,
-  },
+  router,
 }
 </script>
 

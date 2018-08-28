@@ -11,8 +11,6 @@
           <div class="field-over-inner">
             <div>
               <span>ゲームオーバー</span><br>
-              <span>{{score}}点</span>
-              <a class="twitter-share" :href="twitterShareUrl" target="_blank"><i class="fa fa-twitter"></i>点数をツイート</a>
             </div>
           </div>
         </div>
@@ -155,6 +153,7 @@ export default {
   },
   methods: {
     initializeGame() {
+      this.$store.commit('setScore', null);
       for (let i = 0; i < 2; i++) this.waitingLetters.push(this.generateRandomLetter())
       this.field = Array.from({length: 11}, _ => {
         return Array.from({length: 10}, _ => {
@@ -217,6 +216,10 @@ export default {
         if (this.field[this.curY][this.curX].letter){
           this.gameover = true;
           this.sendScore();
+          setTimeout(()=>{
+            this.$store.commit('setScore', this.score);
+            this.$router.push({ path: '/ranking' });
+          },1000)
         } else {
           this.setNewLetter();
         }
